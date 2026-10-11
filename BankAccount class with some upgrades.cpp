@@ -1,0 +1,123 @@
+#include <iostream>
+#include <stdexcept>
+#include <string>
+#include <sstream>
+#include <vector>
+#include <cstdlib>
+#include <memory>
+using namespace std;
+
+class BankAccount{
+    private:
+    string name;
+    int balance;
+
+    public:
+    BankAccount(string owner_name, int inital_balance ){
+        if(inital_balance < 0){
+            throw invalid_argument("Error: negative initial balance");
+        }
+        else{
+            name = owner_name;
+            balance = inital_balance;
+        }
+    }
+    
+    void deposit(int deposit){
+        if(deposit < 0){
+            throw invalid_argument("Error: negative amount");
+        }
+        else{
+            balance += deposit;
+        }
+    }
+
+    void withdraw(int withdraw){
+        if(withdraw < 0){
+            throw invalid_argument("Error: negative amount");
+        }
+
+        else if(balance - withdraw < 0 ){
+            throw logic_error("Error: insufficient funds");
+        }
+
+        else{
+            balance -= withdraw;
+        }
+    }
+
+    int getBalance() const {return balance;}
+
+    string getOwner() const {return name;}
+
+
+};
+
+int main()
+{
+    string input_line;
+    unique_ptr<BankAccount> account;
+    while(getline(cin,input_line)){
+        istringstream iss(input_line);
+        string command;
+        int amount;
+        string name;
+        iss >> command;
+        if(command == "create"){
+            if(account){
+                cout << "Error: account already exists\n";
+            }
+            else{
+                iss >> name;
+                iss >> amount;
+                try{
+                    account = make_unique<BankAccount>(name,amount);
+                }
+                catch(const invalid_argument&){
+                    cout << "Error: negative initial balance" << endl;
+                }
+            }
+        }   
+
+        else if(command == "deposit" && account){
+            iss >> amount;
+            try{
+                account->deposit(amount);
+                cout << "Balance: " << account->getBalance() << endl;
+            }
+            catch(const invalid_argument&){
+                cout << "Error: negative amount" << endl;
+            }
+        }
+
+        else if(command == "withdraw" && account){
+            iss >> amount;
+            try {
+                account->withdraw(amount);
+                cout << "Balance: " << account->getBalance() << endl;
+            }
+            catch(const invalid_argument& ){
+                cout << "Error: negative amount" << endl;
+            }
+            catch(const logic_error&){
+                cout << "Error: insufficient funds" << endl;
+            }
+        }
+
+        else if(command == "getBalance" && account){
+            account->getBalance();
+            cout << "Balance: " << account->getBalance() << endl;
+        }
+
+        else if(command == "getOwner" && account){
+            account->getOwner();
+            cout << "Owner: " << account->getOwner() << endl;
+        }
+
+        else if (command != "create" && !account){
+            cout << "Error: account not created" << "\n";
+        }
+    }
+
+    return 0;
+}
