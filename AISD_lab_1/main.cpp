@@ -176,6 +176,74 @@ class DoublyLinkedList{
     }
 };
 
+
+class DynamicArray{ // начальный размер == 8
+    private:
+    double* data;
+    int current_size;
+    int capacity;
+
+    void resize(){
+        int new_capacity = capacity * 2;
+        double* new_data = new double[new_capacity];
+        for(int idx = 0; idx < current_size; idx+=1){
+            new_data[idx] = data[idx];
+        }
+        delete[] data;
+        data = new_data;
+        capacity = new_capacity;
+    }
+
+    public:
+
+    DynamicArray(): current_size(0), capacity(8){
+    data = new double[capacity];
+    }
+
+    ~DynamicArray(){
+        delete[] data;
+    }
+
+    void push_back(double value){
+        if(current_size == capacity){
+            resize();
+        }
+        data[current_size] = value;
+        current_size += 1;
+    }
+
+    void pop_back(){
+        if(current_size == 0){return;}
+        current_size = current_size - 1;
+    }
+
+    double get(int index){
+        if(index >= 0 && index < current_size){
+            return data[index];
+        }
+        else{
+            throw std::out_of_range("Wrong index");
+        }
+    }
+
+    void set(int index, double value){
+        if(index >= 0 && index < current_size){
+            data[index] = value;
+        }
+        else{
+            throw std::out_of_range("Wrong index");
+        }
+    }
+
+    int get_size() const{
+        return current_size;
+    }
+
+    bool is_empty(){
+        if(current_size == 0){return true;}
+        else{return false;}
+    }
+};
 int main()
 {
 
