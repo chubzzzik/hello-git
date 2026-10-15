@@ -5,7 +5,7 @@
 #include <sstream>
 #include <cstdlib>
 #include <memory>
-#include<cctype>
+#include <cctype>
 #include <cmath>
 
 using namespace std;
