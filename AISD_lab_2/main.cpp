@@ -193,21 +193,49 @@ void timSort(int* array, int n) {
 
 int main() {
     setlocale(LC_ALL, ".UTF8");
-    int n;
-    std::cout << "Введите размер массива\n";
-    if (!(std::cin >> n) || n < 0) return 0;
-    std::cout << "А теперь введите все элементы для массива\n";
-    int* array = n > 0 ? new int[n] : 0;
-    for (int i = 0; i < n; ++i) std::cin >> array[i];
+    const int sizes[] = {10, 128, 500};
+    const int scenarioCount = 3;
 
-    timSort(array, n);
+    // Для больших массивов печатаем первые и последние 10 значений.
+    auto printArrayPreview = [](const int* array, int n) {
+        const int previewSize = 10;
+        if (n <= previewSize * 2) {
+            for (int i = 0; i < n; ++i) {
+                if (i > 0) std::cout << ' ';
+                std::cout << array[i];
+            }
+        } else {
+            for (int i = 0; i < previewSize; ++i) {
+                if (i > 0) std::cout << ' ';
+                std::cout << array[i];
+            }
+            std::cout << " ... (пропущено " << n - previewSize * 2 << ") ... ";
+            for (int i = n - previewSize; i < n; ++i) {
+                if (i > n - previewSize) std::cout << ' ';
+                std::cout << array[i];
+            }
+        }
+        std::cout << '\n';
+    };
 
-    std::cout << "Отсортированный массив:\n";
-    for (int i = 0; i < n; ++i) {
-        if (i > 0) std::cout << ' ';
-        std::cout << array[i];
+    for (int scenario = 0; scenario < scenarioCount; ++scenario) {
+        int n = sizes[scenario];
+        int* array = new int[n];
+
+        // Создаём воспроизводимый, перемешанный пример без генератора случайных чисел.
+        for (int i = 0; i < n; ++i) array[i] = (i * 37) % n;
+
+        std::cout << "Сценарий " << scenario + 1 << ": массив из " << n << " элементов\n";
+        std::cout << "minrun = " << minRunLength(n) << '\n';
+        std::cout << "До сортировки:    ";
+        printArrayPreview(array, n);
+
+        timSort(array, n);
+
+        std::cout << "После сортировки: ";
+        printArrayPreview(array, n);
+        std::cout << '\n';
+        delete[] array;
     }
-    std::cout << '\n';
-    delete[] array;
     return 0;
 }
