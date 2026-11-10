@@ -1,7 +1,5 @@
 #include <iostream>
-
-// Сортировка Timsort для массива целых чисел.
-// Формат ввода: n, затем n целых чисел.
+#include<clocale>
 
 struct Run {
     int start;
@@ -27,7 +25,6 @@ void reverseRange(int* array, int left, int right) {
     }
 }
 
-// Стабильная сортировка вставками для array[left, right).
 void binaryInsertionSort(int* array, int left, int right, int sortedEnd) {
     for (int i = sortedEnd; i < right; ++i) {
         int value = array[i];
@@ -47,8 +44,7 @@ int countRunAndMakeAscending(int* array, int start, int n) {
     int end = start + 1;
     if (end == n) return 1;
 
-    // Убывающий run делаем строго убывающим, чтобы разворот не нарушил
-    // стабильность для равных элементов.
+    // делаем run строго убывающим
     if (array[end] < array[start]) {
         while (end < n && array[end] < array[end - 1]) ++end;
         reverseRange(array, start, end - 1);
@@ -58,7 +54,6 @@ int countRunAndMakeAscending(int* array, int start, int n) {
     return end - start;
 }
 
-// Первая позиция, где элемент больше key (верхняя граница).
 int upperBound(const int* array, int length, int key) {
     int low = 0, high = length;
     while (low < high) {
@@ -69,7 +64,6 @@ int upperBound(const int* array, int length, int key) {
     return low;
 }
 
-// Первая позиция, где элемент не меньше key (нижняя граница).
 int lowerBound(const int* array, int length, int key) {
     int low = 0, high = length;
     while (low < high) {
@@ -104,7 +98,7 @@ void mergeRuns(int* array, const Run& leftRun, const Run& rightRun,
             }
         }
 
-        // Режим галопа: бинарным поиском находим и копируем целый блок.
+        // галоп
         while (i < leftLength && j < rightLength) {
             int leftBlock = upperBound(leftTemp + i, leftLength - i, rightTemp[j]);
             for (int k = 0; k < leftBlock; ++k) array[out++] = leftTemp[i++];
@@ -114,8 +108,7 @@ void mergeRuns(int* array, const Run& leftRun, const Run& rightRun,
             for (int k = 0; k < rightBlock; ++k) array[out++] = rightTemp[j++];
             if (j == rightLength) break;
 
-            // Если ни одна сторона не дала длинную серию, продолжаем обычное
-            // слияние до следующего порога галопа.
+            // если не было достаточно длинной серии, прекращаем галоп, потом - продолжаем
             leftWins = 0;
             rightWins = 0;
             while (i < leftLength && j < rightLength &&
@@ -146,7 +139,7 @@ void timSort(int* array, int n) {
     int* rightTemp = new int[n];
     int runCount = 0;
 
-    // Слияние соседних run, когда нарушены инварианты стека Timsort.
+    // с соседних run, когда нарушены инварианты стека timsort (XYZ)
     auto mergeAt = [&](int index) {
         Run left = runs[index];
         Run right = runs[index + 1];
@@ -199,14 +192,17 @@ void timSort(int* array, int n) {
 }
 
 int main() {
+    setlocale(LC_ALL, ".UTF8");
     int n;
+    std::cout << "Введите размер массива\n";
     if (!(std::cin >> n) || n < 0) return 0;
-
+    std::cout << "А теперь введите все элементы для массива\n";
     int* array = n > 0 ? new int[n] : 0;
     for (int i = 0; i < n; ++i) std::cin >> array[i];
 
     timSort(array, n);
 
+    std::cout << "Отсортированный массив:\n";
     for (int i = 0; i < n; ++i) {
         if (i > 0) std::cout << ' ';
         std::cout << array[i];
